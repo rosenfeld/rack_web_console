@@ -1,4 +1,4 @@
-# Rack Web Console
+# Rack Web Console [![Build Status](https://travis-ci.org/rosenfeld/rack_web_console.svg?branch=master)](https://travis-ci.org/rosenfeld/rack_web_console)
 
 Rack Web Console is a simple Rack app class that allows one to run arbitrary Ruby code on a given
 binding, which may be useful in development mode to test some code in a given context. This is
