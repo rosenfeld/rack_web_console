@@ -18,7 +18,7 @@ describe RackConsole do
       Rack::Handler::WEBrick.run app, BindAddress: '127.0.0.1', Port: port, AccessLog: [],
         Logger: WEBrick::Log.new(nil, 0)
     }
-    sleep 0.1 # give it some time to boot
+    sleep (ENV['WAIT_FOR_BOOT_TIME'] || 0.1).to_f # give it some time to boot
   end
 
   after(:all) do
