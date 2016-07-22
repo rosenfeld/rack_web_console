@@ -96,6 +96,11 @@ Thread.current[:rack_console_capture_all] = true
 Thread.start{ puts 'now it should be displayed in the browser' }.join
 ```
 
+### Shortcuts from inside the textarea
+
+- Ctrl+Enter: Run code
+- Esc, Esc: Clear output
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec`
