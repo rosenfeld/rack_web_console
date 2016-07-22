@@ -20,6 +20,7 @@ class RackConsole
 
 
   def process_script(env)
+    return [403, {}, []] unless same_origin?(env)
     script = CGI.unescape env['rack.input'].read.sub(/\Ascript=/, '')
     @_storage&.script=(script)
     result = []
@@ -35,6 +36,14 @@ class RackConsole
     headers = { 'Content-Type' => 'text/html; charset=utf-8' }
     @_storage.set_cookie_header! headers
     [ 200, headers, [ result.join("\n").gsub("\n", "<br>\n") ] ]
+  end
+
+  def same_origin?(env)
+    env['HTTP_HOST'] == (domain_from(env['HTTP_ORIGIN']) || domain_from(env['HTTP_REFERER']))
+  end
+
+  def domain_from(referer)
+    referer && referer.gsub(%r{(?:\Ahttps?://|/.*)}, '')
   end
 
   def render_view(env)

@@ -30,8 +30,17 @@ describe RackConsole do
     expect(Net::HTTP.get('127.0.0.1', '/', port)).to match %r{<title>Console</title>}
   end
 
-  it 'renders output and return value on POST' do
+  it 'has basic protection against CSRF' do
     response = Net::HTTP.post_form uri, {'script' => "puts 'abc'\nabc"}
+    expect(response.body).to eq ''
+    expect(response).to be_an_instance_of Net::HTTPForbidden
+  end
+
+  it 'renders output and return value on POST' do
+    http = Net::HTTP.new uri.host, uri.port
+    req = Net::HTTP::Post.new(uri, { 'Referer' => uri.to_s })
+    req.set_form_data 'script' => "puts 'abc'\nabc"
+    response = http.request req
     expect(response.body).to eq [
       '<div class="stdout">abc<br>',
       '</div><br>',
@@ -39,7 +48,6 @@ describe RackConsole do
     ].join("\n")
     expect(response['set-cookie']).
       to eq '_rack-console-script=puts+%27abc%27%0Aabc; domain=127.0.0.1; path=/'
-    http = Net::HTTP.new uri.host, uri.port
     resp = http.get '/', {'Cookie' => response['set-cookie'].split(';', 2).first}
     expect(resp.body).
       to match %r{<textarea id="script" rows="10" cols="80">puts &#39;abc&#39;\nabc</textarea>}
