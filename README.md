@@ -41,7 +41,7 @@ require 'rack_web_console'
 
 class App < Roda
   route do |r|
-    r.on('console'){ halt RackConsole.new(binding) }
+    r.on('console'){ halt RackConsole.new(binding) } if ENV['RACK_ENV'] == 'development'
     'default response'
   end
 end
