@@ -37,9 +37,12 @@ describe RackConsole do
   end
 
   it 'renders output and return value on POST' do
+    content = Net::HTTP.get('127.0.0.1', '/', port) # ensure CSRF token is generated
     http = Net::HTTP.new uri.host, uri.port
     req = Net::HTTP::Post.new(uri, { 'Referer' => uri.to_s })
-    req.set_form_data 'script' => "puts 'abc'\nabc"
+    token = /^\s+encodeURIComponent\('(.*?)'\)/m.match(content)[1]
+    #token = RackConsole.class_variable_get(:@@token)
+    req.set_form_data 'script' => "puts 'abc'\nabc", 'token' => token
     response = http.request req
     expect(response.body).to eq [
       '<div class="stdout">abc<br>',

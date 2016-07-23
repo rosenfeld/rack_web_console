@@ -21,6 +21,7 @@
   <div id="results"></div>
 
   <script>
+  ;(function(){
   var run_path = '', lastEscTime = 0,
       results = $el('results'), runScriptButton = $el('run-script'),
       clearResultsButton = $el('clear-results'), script = $el('script'), request
@@ -46,7 +47,8 @@
         div.innerHTML = this.responseText
         results.appendChild(div)
       }
-      request.send('script=' + encodeURIComponent(script.value))
+      request.send('script=' + encodeURIComponent(script.value) + '&token=' +
+          encodeURIComponent('<%= token %>'))
     }
     function onKeyDown(ev) {
       if (ev.ctrlKey && ev.keyCode == 13) runScript() // Ctrl + Enter
@@ -55,6 +57,7 @@
         lastEscTime = new Date().getTime()
       }
     }
+  })();
   </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 require 'erb'
 require 'cgi'
+require 'securerandom'
 require_relative 'rack_console/version'
 require_relative 'rack_console/cookie_script_storage'
 require_relative 'rack_console/output_capture'
@@ -9,6 +10,7 @@ class RackConsole
 
   def initialize(_binding = binding, storage: ->(env){ CookieScriptStorage.new env })
     @storage, @binding = storage, _binding
+    @@token ||= SecureRandom.base64 32
   end
 
   def call(env)
@@ -20,8 +22,10 @@ class RackConsole
 
 
   def process_script(env)
-    return [403, {}, []] unless same_origin?(env)
-    script = CGI.unescape env['rack.input'].read.sub(/\Ascript=/, '')
+    params = CGI.parse env['rack.input'].read
+    token = params['token']&.first.to_s
+    return [403, {}, []] unless same_origin?(env) && token == @@token
+    script = params['script'].first
     @_storage&.script=(script)
     result = []
     (oc = OutputCapture.new).capture do
@@ -52,6 +56,7 @@ class RackConsole
 
   def view_response(env)
     script = (s = @_storage&.script) ? ::ERB::Util.h(s) : ''
+    token = @@token
     ::ERB.new(::File.read view_template).result binding
   end
 
