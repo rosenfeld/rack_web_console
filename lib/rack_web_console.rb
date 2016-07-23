@@ -8,9 +8,9 @@ require_relative 'rack_console/output_capture'
 class RackConsole
   VIEW_TEMPLATE = ::File.join __dir__, 'rack-console-view.erb'
 
-  def initialize(_binding = binding, storage: ->(env){ CookieScriptStorage.new env })
+  def initialize(_binding = binding, storage: ->(env){ CookieScriptStorage.new env }, token: nil)
     @storage, @binding = storage, _binding
-    @@token ||= SecureRandom.base64 32
+    @@token ||= token || SecureRandom.base64(32)
   end
 
   def call(env)
