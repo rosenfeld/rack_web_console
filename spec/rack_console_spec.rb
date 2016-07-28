@@ -45,8 +45,8 @@ describe RackConsole do
     req.set_form_data 'script' => "puts 'abc'\nabc", 'token' => token
     response = http.request req
     expect(response.body).to eq [
-      '<div class="stdout">abc<br>',
-      '</div><br>',
+      '<div class="stdout">abc',
+      '</div>',
       '<div class="return">1</div>'
     ].join("\n")
     expect(response['set-cookie']).
