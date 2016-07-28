@@ -39,7 +39,7 @@ class RackConsole
     end
     headers = { 'Content-Type' => 'text/html; charset=utf-8' }
     @_storage.set_cookie_header! headers
-    [ 200, headers, [ result.join("\n").gsub("\n", "<br>\n") ] ]
+    [ 200, headers, [ result.join("\n") ] ]
   end
 
   def same_origin?(env)
