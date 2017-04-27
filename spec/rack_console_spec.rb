@@ -67,7 +67,7 @@ describe RackConsole do
       '</div>',
       '<div class="error">error'
     ].join("\n")
-    expect(response.body).to match /class="error">error.*rack_web_console.rb:.*eval/m
+    expect(response.body).to match /class="error">error.*rack_web_console.rb:.*process_script/m
   end
 
   def uri
