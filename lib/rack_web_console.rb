@@ -20,7 +20,6 @@ class RackConsole
 
   private
 
-
   def process_script(env)
     params = CGI.parse env['rack.input'].read
     token = params['token']&.first.to_s
@@ -34,7 +33,9 @@ class RackConsole
         result << %Q{<div class="stdout">#{::ERB::Util.h oc.output}</div>}
         result << %Q{<div class="return">#{::ERB::Util.h result_eval.inspect}</div>}
       rescue ::Exception => e
-        result << e.message << "\n" << e.backtrace.join("\n")
+        message = ::ERB::Util.h "#{e.message}\n#{e.backtrace.join "\n"}"
+        result << %Q{<div class="stdout">#{::ERB::Util.h oc.output}</div>}
+        result << %Q{<div class="error">#{message}</div>}
       end
     end
     headers = { 'Content-Type' => 'text/html; charset=utf-8' }

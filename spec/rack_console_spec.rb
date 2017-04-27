@@ -37,13 +37,7 @@ describe RackConsole do
   end
 
   it 'renders output and return value on POST' do
-    content = Net::HTTP.get('127.0.0.1', '/', port) # ensure CSRF token is generated
-    http = Net::HTTP.new uri.host, uri.port
-    req = Net::HTTP::Post.new(uri, { 'Referer' => uri.to_s })
-    token = /^\s+encodeURIComponent\('(.*?)'\)/m.match(content)[1]
-    #token = RackConsole.class_variable_get(:@@token)
-    req.set_form_data 'script' => "puts 'abc'\nabc", 'token' => token
-    response = http.request req
+    response = run_script "puts 'abc'\nabc", port
     expect(response.body).to eq [
       '<div class="stdout">abc',
       '</div>',
@@ -51,9 +45,29 @@ describe RackConsole do
     ].join("\n")
     expect(response['set-cookie']).
       to eq '_rack-console-script=puts+%27abc%27%0Aabc; domain=127.0.0.1; path=/'
-    resp = http.get '/', {'Cookie' => response['set-cookie'].split(';', 2).first}
+    resp = @http.get '/', {'Cookie' => response['set-cookie'].split(';', 2).first}
     expect(resp.body).
       to match %r{<textarea id="script" rows="10" cols="80">puts &#39;abc&#39;\nabc</textarea>}
+  end
+
+  def run_script(script, port)
+    content = Net::HTTP.get('127.0.0.1', '/', port) # ensure CSRF token is generated
+    @http = Net::HTTP.new uri.host, uri.port
+    req = Net::HTTP::Post.new(uri, { 'Referer' => uri.to_s })
+    token = /^\s+encodeURIComponent\('(.*?)'\)/m.match(content)[1]
+    #token = RackConsole.class_variable_get(:@@token)
+    req.set_form_data 'script' => script, 'token' => token
+    @http.request req
+  end
+
+  it 'renders output and exception details when it happens' do
+    response = run_script "puts 'abc'\nraise 'error'", port
+    expect(response.body).to match [
+      '<div class="stdout">abc',
+      '</div>',
+      '<div class="error">error'
+    ].join("\n")
+    expect(response.body).to match /class="error">error.*rack_web_console.rb:.*eval/m
   end
 
   def uri
