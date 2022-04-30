@@ -73,9 +73,9 @@ Rails.application.routes.draw do
 end
 ```
 
-The `rails-web-console` gem is probably a better gem to use with Rails but this example should
-demonstrate how it could be used with basically any framework. If you're not really interested
-on some specific binding, you can simply mount it directly in config.ru:
+This example demonstrates how to use it with a Rails project, but it could be used with basically
+any framework. If you're not really interested on some specific binding, you can simply mount it
+directly in config.ru:
 
 ```ruby
 # config.ru
