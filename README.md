@@ -60,7 +60,7 @@ class ConsoleController < ApplicationController
   skip_before_action :verify_authenticity_token
 
   def index
-    status, headers, body = RackConsole.new(binding).call(env)
+    status, headers, body = RackConsole.new(binding).call(request.env)
     response.headers.merge headers
     render inline: body.join("\n"), status: status
   end
