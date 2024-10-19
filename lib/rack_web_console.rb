@@ -21,7 +21,9 @@ class RackConsole
   private
 
   def process_script(env)
-    params = CGI.parse env['rack.input'].read
+    rack_input = env['rack.input']
+    rack_input.rewind
+    params = CGI.parse rack_input.read
     token = params['token']&.first.to_s
     return [403, {}, []] unless same_origin?(env) && token == @@token
     script = params['script'].first

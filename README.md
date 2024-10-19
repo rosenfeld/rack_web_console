@@ -57,12 +57,12 @@ you may have to do this:
 # app/controllers/console_controller.rb:
 require 'rack_web_console'
 class ConsoleController < ApplicationController
-  skip_before_action :verify_authenticity_token
+  skip_forgery_protection
 
   def index
     status, headers, body = RackConsole.new(binding).call(request.env)
-    response.headers.merge headers
-    render inline: body.join("\n"), status: status
+    response.headers.merge! headers
+    render html: body.join("\n").html_safe, status: status
   end
 end
 
